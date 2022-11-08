@@ -19,20 +19,21 @@ def main():
     print(df.columns)
     df["isWinner"] = df.apply(lambda x: add_is_winner_column(x.TEAM_ID,x.HOME_TEAM_ID,x.HOME_TEAM_WINS), axis=1)
     df = df.drop(["HOME_TEAM_ID", "VISITOR_TEAM_ID", "HOME_TEAM_WINS"], axis=1)
-
     #df is cleaned and ready to go right here
-    exploratory_analysis(df)
+    # exploratory_analysis(df)
+    linear_reg_penalties_ftm(df)
 
 
 
 
 def get_data():
     game_details_df = pd.read_csv('games_details.csv', sep=',')
-    game_details_df = game_details_df[["GAME_ID", "TEAM_ID", "FGM", "FGA","FG3M","FG3A","FTM","FTA"]]
+    game_details_df = game_details_df[["GAME_ID", "TEAM_ID", "FGM", "FGA","FG3M","FG3A","FTM","FTA","TO"]]
     games_df = pd.read_csv('games.csv', sep=',')[["GAME_ID","SEASON","HOME_TEAM_ID","VISITOR_TEAM_ID", "HOME_TEAM_WINS"]]
     teams_df = pd.read_csv('teams.csv', sep=',')[["TEAM_ID","NICKNAME","CITY"]]
     df_combined = pd.merge(game_details_df, games_df, on='GAME_ID', how='outer')
     df_combined = pd.merge(df_combined, teams_df, on='TEAM_ID', how='outer')
+    df_combined = df_combined.rename({'TO':'FOULS'}, axis=1)
     return df_combined
 
 def organize_data(df):
@@ -63,15 +64,36 @@ def add_is_winner_column(team_id, home_team_id,home_team_wins):
 
 
 def exploratory_analysis(df):
-    # ftm_hist_plt(df)
-    the_pie_plt(df)
+    ftm_hist_plt(df)
+    the_pies_plt(df)
+    pts_margin, avg_pts = average_lost_by_point()
+    print(pts_margin, avg_pts) #team wins on average by 11 points, on avg teams score 104 pts, therefore team usually gets beaten by 10.5% on avg\
+    #compare how the pie chart shows that free throws make up around 14.3% of points, would seem reasonable that free throws could be a significant component of winning condition
+
 
     
 
 
 
+def average_lost_by_point():
+    games_df = pd.read_csv('games.csv', sep=',')[["SEASON", "PTS_home", "PTS_away"]]
+    games_df = games_df[games_df["SEASON"] >=2010].dropna()
+    
+    games_df["margin_pts"] = games_df.apply(lambda x: create_avg_lost_point_column(x.PTS_home,x.PTS_away), axis=1)
+    games_df["avg_pts"] = games_df.apply(lambda x: create_avg_points_column(x.PTS_home,x.PTS_away), axis=1)
+    return np.mean(games_df["margin_pts"]), np.mean(games_df["avg_pts"])
+    
 
-def the_pie_plt(df):
+def create_avg_lost_point_column(points_home,points_away):
+    return abs(points_away - points_home)
+
+def create_avg_points_column(points_home,points_away):
+    return (points_away + points_home)/2
+
+
+
+
+def the_pies_plt(df):
     ftm = sum(df["FTM"])
     fgm = sum(df["FGM"])
     fg3m = sum(df["FG3M"])
