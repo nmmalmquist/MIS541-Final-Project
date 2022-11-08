@@ -33,7 +33,7 @@ def two_pointers_made_by_game(df):
 
 
 def two_pointers_attempted(df):
-    df = df.groupby(['GAME_ID', 'TEAM_ID'])['FGA'].mean().to_frame()
+    df.set_index('ID', inplace=True)
     df = df.dropna()
     df = df.reset_index()
     return df
