@@ -12,6 +12,7 @@ import datetime as dt
 import matplotlib.pyplot as plt
 import math
 import numpy as np
+from statsmodels.formula.api import ols
 
 def main():
     df = get_data()
@@ -20,7 +21,8 @@ def main():
     df["isWinner"] = df.apply(lambda x: add_is_winner_column(x.TEAM_ID,x.HOME_TEAM_ID,x.HOME_TEAM_WINS), axis=1)
     df = df.drop(["HOME_TEAM_ID", "VISITOR_TEAM_ID", "HOME_TEAM_WINS"], axis=1)
     #df is cleaned and ready to go right here
-    # exploratory_analysis(df)
+    exploratory_analysis(df)
+    df.to_csv("test.csv")
     linear_reg_penalties_ftm(df)
 
 
@@ -31,12 +33,14 @@ def get_data():
     game_details_df = game_details_df[["GAME_ID", "TEAM_ID", "FGM", "FGA","FG3M","FG3A","FTM","FTA","TO"]]
     games_df = pd.read_csv('games.csv', sep=',')[["GAME_ID","SEASON","HOME_TEAM_ID","VISITOR_TEAM_ID", "HOME_TEAM_WINS"]]
     teams_df = pd.read_csv('teams.csv', sep=',')[["TEAM_ID","NICKNAME","CITY"]]
-    df_combined = pd.merge(game_details_df, games_df, on='GAME_ID', how='outer')
-    df_combined = pd.merge(df_combined, teams_df, on='TEAM_ID', how='outer')
+    df_combined = pd.merge(game_details_df, games_df, on='GAME_ID', how='inner')
+    df_combined = pd.merge(df_combined, teams_df, on='TEAM_ID', how='inner')
     df_combined = df_combined.rename({'TO':'FOULS'}, axis=1)
+    df_combined = df_combined.drop_duplicates(ignore_index=True)#SOURCE DATA HAS DUPLICATES
     return df_combined
 
 def organize_data(df):
+    print(df.columns)
     df_game_consolidated = df.groupby(["GAME_ID", "TEAM_ID","SEASON","HOME_TEAM_ID","VISITOR_TEAM_ID", "HOME_TEAM_WINS", "NICKNAME", "CITY"]).sum()
     df_game_consolidated = df_game_consolidated.reset_index()
     df_game_consolidated = df_game_consolidated.dropna(subset=["GAME_ID", "TEAM_ID","SEASON","HOME_TEAM_ID","VISITOR_TEAM_ID", "HOME_TEAM_WINS", "NICKNAME", "CITY"])
@@ -48,7 +52,6 @@ def organize_data(df):
                     'VISITOR_TEAM_ID': str
                     }
     df_game_consolidated = df_game_consolidated.astype(convert_dict)
-    # using dictionary to convert specific columns
     return df_game_consolidated
 
 def add_is_winner_column(team_id, home_team_id,home_team_wins):
@@ -118,7 +121,7 @@ def the_pies_plt(df):
     plt.show()  
 
 def ftm_hist_plt(df):
-    plt.hist(df["FTM"], bins=30, edgecolor="gray", color="navy")
+    plt.hist(df["FTM"], bins=15, edgecolor="gray", color="navy")
     plt.title("Free Throws Made Per Game", color="black")
     plt.xlabel("Free Throws Made")
     plt.ylabel("Count")
@@ -133,7 +136,13 @@ def ftm_hist_plt(df):
 
 
 
-
+def linear_reg_penalties_ftm(df):
+    ols_model = ols('FTM ~ FOULS',df).fit()
+    plt.scatter(df["FOULS"], df["FTM"], marker="+", s=10)
+    print(ols_model.summary())
+    plt.plot(df["FOULS"], ols_model.params["FOULS"]*df["FOULS"]+ols_model.params["Intercept"], color="green")
+ 
+    plt.show()
 
 
 
