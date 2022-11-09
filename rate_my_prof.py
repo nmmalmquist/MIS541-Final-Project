@@ -9,6 +9,12 @@ def main():
     1391: "University of Arkansas", 60: "Auburn University", 3071: "Louisiana State University", 
     1265: "University of Mississippi", 617: "Mississippi State University", 1003: "Texas A&M University" }
 
+    rmp_sec_school_dict ={ 1101: "University of Georgia", 1118: "University of Kentucky",
+    1321: "University of Missouri", 1309: "University of South Carolina", 
+    1385: "University of Tennessee", 4002: "Vanderbilt University", 1058: "University of Alabama", 
+    1391: "University of Arkansas", 60: "Auburn University", 3071: "Louisiana State University", 
+    1265: "University of Mississippi", 617: "Mississippi State University", 1003: "Texas A&M University" }
+
     rmp_arts_school_dict ={  32: "American University", 1320: "University of Vermont", 
     696: "Northeastern University", 709: "Northwestern University", 675: "New York University",
     1072: "University of California Berkeley", 4086: "Mount Saint Mary's University",
@@ -19,14 +25,16 @@ def main():
     #scrape_school_tid_for_all_prof(rmp_sec_school_dict)
     
     # scrape_school_tid_for_all_prof(rmp_arts_school_dict)
-    for sec_college_name in list(rmp_sec_school_dict.values())[:1]:
+    for sec_college_name in list(rmp_sec_school_dict.values()):
+        count = 0
         review_df = pd.DataFrame(columns=["prof_id","quality","difficulty","comment"])
         df_tids = pd.read_csv(f"./SEC_DATA/{sec_college_name}_tid.csv")
         for tid in list(df_tids["prof_id"]):
             review_list = RateMyProfApi().create_reviews_list(tid)
             for review in review_list:
-                print({"prof_id":tid,"quality":review["rOverall"], "difficulty":review["rEasy"], "comment":review["rComments"][:15]})
+                print(count)
                 review_df.loc[len(review_df.index)] = [tid, review["rOverall"], review["rEasy"],review["rComments"]]
+            count +=1
         review_df.to_csv(f"./SEC_DATA_REVIEWS/{sec_college_name}_reviews.csv")
     
 
