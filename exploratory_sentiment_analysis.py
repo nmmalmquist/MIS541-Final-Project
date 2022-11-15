@@ -21,22 +21,29 @@ def main():
     print(arts_df[['quality', 'difficulty', 'sentiment_score']].describe(), end='\n\n')
     print(sec_df[['quality', 'difficulty', 'sentiment_score']].describe(), end='\n\n')
 
+    sentiment_score_school_plot(arts_df)
+    sentiment_score_school_plot(sec_df)
 
+
+
+
+def sentiment_score_school_plot(df):
+    df_group = df[["quality","sentiment_score", "school_name"]].groupby(['school_name']).mean().reset_index()
+    df_group = df_group.rename({0:'average'}, axis = 1)
+    df_pivot = df_group.pivot(index='school_name', columns=['sentiment_score', 'quality'], values=['sentiment_score', 'quality'])
+    #print(df_pivot)
+    df_pivot.plot(kind="bar")
+    plt.title("Sentiment & Professor Quality by School")
+    plt.xlabel("School")
+    plt.yticks(np.arange(0,5,.5))
+    plt.xticks(rotation=90)
+    plt.ylabel("Sentiment Score (-1 - 1 ) & Quality (1-5)")
+    plt.legend('')
+    #plt.tight_layout()
+    plt.show()
 
 
 main()
 
 
 
-# def sentiment_score_rating_plot(df):
-#     df_group = df[["overall","sentiment_type"]].groupby(['overall','sentiment_type']).value_counts().to_frame().reset_index()
-#     df_group = df_group.rename({0:'count'}, axis = 1)
-#     df_pivot = df_group.pivot(index='overall', columns='sentiment_type', values='count')
-#     print(df_pivot)
-#     df_pivot.plot(kind="bar")
-#     plt.title("Sentiment Type Distribution Across Ratings")
-#     plt.xlabel("Rating")
-#     plt.yticks(np.arange(0,30000,2000))
-#     plt.xticks(rotation=0)
-#     plt.ylabel("Number of Reviews")
-#     plt.show()
