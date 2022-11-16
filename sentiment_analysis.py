@@ -13,6 +13,7 @@ def main():
     #print(arts_df.columns)
     #print(sec_df.columns)
 
+
     arts_df['comment'] = arts_df.apply(lambda x: clean_comment(x.comment), axis=1  ) #regex cleaning comments
     sec_df['comment'] = sec_df.apply(lambda x: clean_comment(x.comment), axis=1  ) #regex cleaning comments
 

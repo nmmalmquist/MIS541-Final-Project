@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def main():
@@ -52,9 +53,11 @@ def main():
         arts_reviews_df = arts_reviews_df.append(school)
 
     sec_df = join_schools(sec_prof_df, sec_reviews_df)
+    sec_df = sec_df.dropna(subset="quality")
     sec_df.to_csv('./merged_data/SEC Schools.csv')
 
     arts_df = join_schools(arts_prof_df, arts_reviews_df)
+    arts_df = arts_df.dropna(subset="quality")
     arts_df.to_csv('./merged_data/Liberal Arts Schools.csv')
 
 
@@ -65,6 +68,5 @@ def join_schools(df1, df2):
     df_combined = df_combined.drop(columns='Unnamed: 0_x', axis=1)
     df_combined = df_combined.drop(columns='Unnamed: 0_y', axis=1)
     return df_combined
-
 
 main()
