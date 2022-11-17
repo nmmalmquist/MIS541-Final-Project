@@ -9,18 +9,23 @@ from sklearn.cluster import KMeans
 
 def main():
 
+    #We make our unit at the professor level instead of the review level
     sec_data = pd.read_csv("./merged_data/SEC Schools Sentiment.csv")
+    sec_data = sec_data.groupby(["prof_id","first_name","gender", "school_name","school_id"]).mean().reset_index()
     arts_data = pd.read_csv("./merged_data/Liberal Arts Schools Sentiment.csv")
+    arts_data = arts_data.groupby(["prof_id","first_name","gender", "school_name","school_id"]).mean().reset_index()
+    
+
 
     # #OLS Linear Regression on Sentiment Score and Rating
-    sentiment_vs_quality(sec_data,arts_data)
+    # sentiment_vs_quality(sec_data,arts_data)
 
-    # #doing logistical regression on gender ~ sentiment_score + difficulty + quality
-    logit_plot(sec_data)
-    logit_plot(arts_data)
-    corr_map(sec_data)
-    corr_map(arts_data)
-    cluster_analysis(sec_data.append(arts_data))
+    # cluster_analysis(sec_data.append(arts_data))
+    # # #doing logistical regression on gender ~ sentiment_score + difficulty + quality
+    # logit_plot(sec_data)
+    # logit_plot(arts_data)
+    # corr_map(sec_data)
+    # corr_map(arts_data)
 
 
 def corr_map(df):
@@ -113,7 +118,7 @@ def plot_clusters(df, cluster_count):
     
     for i in range(cluster_count):
         df_cluster = df[df['cluster'] == i]
-        plt.scatter(df_cluster['quality_norm'], df_cluster['difficulty_norm'], 
+        plt.scatter(df_cluster['quality'], df_cluster['difficulty'], 
                     s=20, color=color_list[i], marker="*")
         
     plt.title('Clusters')
