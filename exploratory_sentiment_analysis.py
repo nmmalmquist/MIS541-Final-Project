@@ -24,9 +24,10 @@ def main():
     print(arts_df[['quality', 'difficulty', 'sentiment_score']].describe(), end='\n\n')
     print(sec_df[['quality', 'difficulty', 'sentiment_score']].describe(), end='\n\n')
 
-    sentiment_score_school_plot(arts_df)
-    sentiment_score_school_plot(sec_df)
-
+    # sentiment_score_school_plot(arts_df)
+    # sentiment_score_school_plot(sec_df)
+    quality_gender_plot(arts_df)
+    quality_gender_plot(sec_df)
 
 
 
@@ -47,6 +48,24 @@ def sentiment_score_school_plot(df):
     #plt.tight_layout()
     plt.show()
 
+def quality_gender_plot(df):
+    df = df[(df["gender"] == "male") | (df["gender"] == "female") ]
+
+    df_group = df[["quality","sentiment_score","gender"]].groupby(['gender']).mean().reset_index()
+    # df_group = df_group.rename({0:'average'}, axis = 1)
+    # df_pivot = df_group.pivot(index='school_name', columns=['sentiment_score', 'quality'], values=['sentiment_score', 'quality'])
+    #print(df_pivot)
+    plt.bar(df_group["gender"],df_group["quality"])
+    plt.axhline(df_group["quality"].mean(), color="red")
+    plt.text(1, df_group["quality"].mean() + .2,"Mean " + str(round(df_group["quality"].mean(),2)), color="red")
+    plt.title("Sentiment & Professor Quality by School")
+    plt.xlabel("School")
+    plt.yticks(np.arange(0,5,.5))
+    plt.xticks(rotation=80)
+    plt.ylabel(" Quality (1-5)")
+    plt.legend('')
+    #plt.tight_layout()
+    plt.show()
 
 main()
 
