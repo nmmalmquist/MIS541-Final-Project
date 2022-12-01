@@ -89,12 +89,20 @@ def rating_no_comment(df):
 
 
 def num_prof_by_gender(arts, sec):
-    arts_gender = arts.groupby(
-        'gender').value_counts()
-    sec_gender = sec.groupby('gender').value_counts()
+    sec_gender = pd.read_csv("./merged_data/SEC Schools Sentiment.csv")
+    sec_gender = sec_gender.groupby(["prof_id", "first_name", "gender",
+                                     "school_name", "school_id"]).mean().reset_index()
+    arts_gender = pd.read_csv(
+        "./merged_data/Liberal Arts Schools Sentiment.csv")
+    arts_gender = arts_gender.groupby(["prof_id", "first_name", "gender",
+                                       "school_name", "school_id"]).mean().reset_index()
 
-    arts_gender = arts_gender.reset_index()
-    sec_gender = sec_gender.reset_index()
+    # arts_gender = arts.groupby(
+    #     'prof_id')['gender'].value_counts().to_frame()
+    # sec_gender = sec.groupby('prof_id')['gender'].value_counts().to_frame()
+
+    # arts_gender = arts_gender.reset_index()
+    # sec_gender = sec_gender.reset_index()
 
     arts_gender = arts_gender[arts_gender.gender != 'andy']
     arts_gender = arts_gender[arts_gender.gender != 'unknown']
