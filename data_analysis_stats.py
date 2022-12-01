@@ -18,14 +18,14 @@ def main():
 
 
     # #OLS Linear Regression on Sentiment Score and Rating
-    # sentiment_vs_quality(sec_data,arts_data)
+    sentiment_vs_quality(sec_data,arts_data)
 
-    # cluster_analysis(sec_data.append(arts_data))
+    cluster_analysis(sec_data.append(arts_data))
     # # #doing logistical regression on gender ~ sentiment_score + difficulty + quality
-    # logit_plot(sec_data)
-    # logit_plot(arts_data)
-    # corr_map(sec_data)
-    # corr_map(arts_data)
+    logit_plot(sec_data)
+    logit_plot(arts_data)
+    corr_map(sec_data)
+    corr_map(arts_data)
 
 
 def corr_map(df):
